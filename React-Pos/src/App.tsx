@@ -1,38 +1,34 @@
-import './App.css'
-import {createBrowserRouter} from "react-router";
 import {Dashboard} from "./pages/Dashboard.tsx";
-import {RouterProvider} from "react-router/dom";
-import {AddCustomer} from "./pages/AddCustomer.tsx";
-import {Error} from "./component/Error.tsx";
-import {RouteLayout} from "./component/RouteLayout.tsx";
-import {CustomerProvider} from "./component/CustomerProvider.tsx";
-import {UpdateCustomer} from "./pages/UpdateCustomer.tsx";
+import {createBrowserRouter, RouterProvider} from "react-router-dom";
+import {RouteLayout} from "./Components/RouteLayout.tsx";
+import {Customer} from "./pages/Customer.tsx";
+import {Error} from "./Components/Error.tsx";
+import {CustomerProvider} from "./contexts/CustomerProvider.tsx";
+import {Item} from "./pages/Item.tsx";
+import {ItemProvider} from "./contexts/ItemProvider.tsx";
+import {Orders} from "./pages/Orders.tsx";
 
-
-function App() {
-
+function App(){
     const routes = createBrowserRouter([
         {
             path: "/",
-            element: <RouteLayout/>,
-            children: [
-                {path: '/', element: <Dashboard/>},
-                {path:'add', element: <AddCustomer/>},
-                {path:'update/:email', element: <UpdateCustomer/>}
-            ]
+                element: <RouteLayout/>,
+                children: [
+                    {path: '/', element: <Dashboard/>},
+                    {path: '/customer', element: <Customer/>},
+                    {path: '/item', element: <Item/>},
+                    {path: '/orders', element: <Orders/>},
+                ]
         },
-        {path: '*', element: <Error/>}
-    ]);
+    {path: '*', element: <Error/>}
+    ])
 
-    return (
-        <>
-            <CustomerProvider>
-                <RouterProvider router={routes} >
-                </RouterProvider>
-            </CustomerProvider>
-
-        </>
-    )
+    return(
+        <CustomerProvider>
+            <ItemProvider>
+                <RouterProvider router={routes}></RouterProvider>
+            </ItemProvider>
+        </CustomerProvider>)
 }
 
-export default App
+export default App;

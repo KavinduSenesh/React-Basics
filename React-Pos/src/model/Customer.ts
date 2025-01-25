@@ -1,9 +1,11 @@
-export class Customer {
-    name: string;
-    email: string;
-    mobile: string;
+export class Customer{
+    id : string;
+    name : string;
+    email : string;
+    mobile : number;
 
-    constructor(name: string, email: string, mobile: string) {
+    constructor( id : string, name : string, email : string, mobile : number) {
+        this.id = id;
         this.name = name;
         this.email = email;
         this.mobile = mobile;
