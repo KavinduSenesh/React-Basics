@@ -7,15 +7,35 @@ export default function RootLayout() {
     const [name, setName] = useState('');
     const [price, setPrice] = useState('');
     const [quantity, setQuantity] = useState('');
-    const [items, setItems] = useState<ItemModel[]>([]);
+    const [items, setItems] = useState<ItemModel[]>([])
+    const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
     function handleSubmit() {
-        const newItem = new ItemModel(name, parseFloat(price), parseFloat(quantity));
-        setItems([...items, newItem]);
-
+        if (editingIndex !== null){
+            const updatedItems = [...items];
+            updatedItems[editingIndex] = new ItemModel(name, parseFloat(price), parseFloat(quantity));
+            setItems(updatedItems);
+            setEditingIndex(null);
+        }else{
+            const newItem = new ItemModel(name, parseFloat(price), parseFloat(quantity));
+            setItems([...items, newItem]);
+        }
         setName('');
         setPrice('');
         setQuantity('');
+    }
+
+    function editItem(index: number){
+        const item = items[index];
+        setName(item.name);
+        setPrice(item.price.toString());
+        setQuantity(item.quantity.toString());
+        setEditingIndex(index);
+    }
+
+    function deleteItem(index: number){
+        const filteredItems = items.filter((_, i) => i !== index);
+        setItems(filteredItems);
     }
 
     return (
@@ -51,7 +71,9 @@ export default function RootLayout() {
                         style={styles.button}
                         onPress={handleSubmit}
                     >
-                        <Text style={styles.buttonText}>Save Item</Text>
+                        <Text style={styles.buttonText}>
+                            {editingIndex !== null ? "Update Items" : "Add Items"}
+                        </Text>
                     </TouchableOpacity>
                 </View>
 
@@ -59,7 +81,7 @@ export default function RootLayout() {
                     style={tw`mt-6 w-full`}
                     data={items}
                     keyExtractor={(_, index) => index.toString()}
-                    renderItem={({ item }) => (
+                    renderItem={({ item, index }) => (
                         <View style={styles.card}>
                             <Text style={styles.cardName}>{item.name}</Text>
                             <View style={styles.cardDetails}>
@@ -69,6 +91,14 @@ export default function RootLayout() {
                             <View style={styles.cardDetails}>
                                 <Text style={styles.cardLabel}>Quantity:</Text>
                                 <Text style={styles.cardValue}>{item.quantity}</Text>
+                            </View>
+                            <View style={styles.cardActions}>
+                                <TouchableOpacity style={styles.editButton} onPress={() => editItem(index)}>
+                                    <Text style={styles.buttonText}>Edit</Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity style={styles.deleteButton} onPress={() => deleteItem(index)}>
+                                    <Text style={styles.buttonText}>Delete</Text>
+                                </TouchableOpacity>
                             </View>
                         </View>
                     )}
@@ -167,5 +197,22 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#333',
         flex: 1,
-    }
+    },
+    cardActions: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 10,
+    },
+    editButton: {
+        backgroundColor: '#10B981',
+        paddingVertical: 8,
+        paddingHorizontal: 14,
+        borderRadius: 6,
+    },
+    deleteButton: {
+        backgroundColor: '#EF4444',
+        paddingVertical: 8,
+        paddingHorizontal: 14,
+        borderRadius: 6,
+    },
 });
