@@ -8,14 +8,35 @@ export default function Customer() {
     const [email, setEmail] = useState('');
     const [mobile, setMobile] = useState('');
     const [customers, setCustomers] = useState<CustomerModel[]>([]);
+    const [editingIndex, setEditingIndex] = useState<number | null>(null)
 
     function handleSubmit() {
+    if (editingIndex !== null){
+        //update existing customer
+        const updatedCustomers = [...customers];
+        updatedCustomers[editingIndex] = new CustomerModel(name, email, mobile);
+        setCustomers(updatedCustomers);
+        setEditingIndex(null);
+    }else{
         const newCustomer = new CustomerModel(name, email, mobile);
         setCustomers([...customers, newCustomer]);
-
+    }
         setName('');
         setEmail('');
         setMobile('');
+    }
+
+    function editCustomer(index: number){
+        const customer = customers[index];
+        setName(customer.name);
+        setEmail(customer.email);
+        setMobile(customer.mobile);
+        setEditingIndex(index);
+    }
+
+    function deleteCustomer(index: number){
+        const filteredCustomers = customers.filter((_, i) => i !== index);
+        setCustomers(filteredCustomers);
     }
 
     return (
@@ -51,7 +72,9 @@ export default function Customer() {
                     style={styles.button}
                     onPress={handleSubmit}
                 >
-                    <Text style={styles.buttonText}>Save Customer</Text>
+                    <Text style={styles.buttonText}>
+                        {editingIndex !== null ? 'Update Customer' : 'Add Customer'}
+                    </Text>
                 </TouchableOpacity>
             </View>
 
@@ -59,7 +82,7 @@ export default function Customer() {
                 style={tw`mt-6 w-full`}
                 data={customers}
                 keyExtractor={(_, index) => index.toString()}
-                renderItem={({ item }) => (
+                renderItem={({ item, index }) => (
                     <View style={styles.card}>
                         <Text style={styles.cardName}>{item.name}</Text>
                         <View style={styles.cardDetails}>
@@ -69,6 +92,14 @@ export default function Customer() {
                         <View style={styles.cardDetails}>
                             <Text style={styles.cardLabel}>Mobile:</Text>
                             <Text style={styles.cardValue}>{item.mobile}</Text>
+                        </View>
+                        <View style={styles.cardActions}>
+                            <TouchableOpacity style={styles.editButton} onPress={() => editCustomer(index)}>
+                                <Text style={styles.buttonText}>Edit</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity style={styles.deleteButton} onPress={() => deleteCustomer(index)}>
+                                <Text style={styles.buttonText}>Delete</Text>
+                            </TouchableOpacity>
                         </View>
                     </View>
                 )}
@@ -167,5 +198,22 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: '#333',
         flex: 1,
+    },
+    cardActions: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginTop: 10,
+    },
+    editButton: {
+        backgroundColor: '#10B981',
+        paddingVertical: 8,
+        paddingHorizontal: 14,
+        borderRadius: 6,
+    },
+    deleteButton: {
+        backgroundColor: '#EF4444',
+        paddingVertical: 8,
+        paddingHorizontal: 14,
+        borderRadius: 6,
     },
 });
